@@ -2,88 +2,181 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Movie Recommendation Chat</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background-color: #f4f4f4; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
         }
-        #container { 
-            width: 600px; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 5px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #chat { 
-            width: 100%; 
-            height: 400px; 
-            border: 1px solid #ccc; 
-            padding: 10px; 
-            overflow-y: scroll; 
-            margin-bottom: 10px; 
-            border-radius: 5px; 
-            background-color: #fafafa;
+
+        #container {
+            width: 600px;
+            background: #ffffff;
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
-        #inputSection { 
-            display: flex; 
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #343a40;
+            font-size: 28px;
         }
-        #input { 
-            flex: 1; 
-            padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
+
+        #chat {
+            flex: 1;
+            width: 100%;
+            border: none;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #inputSection {
+            display: flex;
+        }
+
+        #input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 25px;
             font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
         }
-        #send { 
-            padding: 10px 20px; 
-            border: none; 
-            background: #28a745; 
-            color: #fff; 
-            border-radius: 5px; 
-            margin-left: 10px; 
-            cursor: pointer; 
+
+        #input:focus {
+            border-color: #80bdff;
+        }
+
+        #send {
+            padding: 0 20px;
+            margin-left: 10px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
             font-size: 16px;
+            transition: background 0.3s;
         }
-        #send:hover { 
-            background: #218838; 
+
+        #send:hover {
+            background: #0056b3;
         }
-        .message { 
-            margin: 10px 0; 
+
+        .message {
+            max-width: 80%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        .user { 
-            color: #007bff; 
+
+        .user {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: #fff;
+            border-bottom-right-radius: 0;
         }
-        .assistant { 
-            color: #17a2b8; 
+
+        .assistant {
+            align-self: flex-start;
+            background-color: #f1f0f0;
+            color: #343a40;
+            border-bottom-left-radius: 0;
         }
-        .loading { 
-            font-style: italic; 
-            color: #6c757d; 
+
+        .loading {
+            font-style: italic;
+            color: #6c757d;
         }
+
         ol {
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin-top: 10px;
             padding-left: 20px;
+            color: #343a40;
         }
+
         li {
             margin-bottom: 5px;
         }
+
+        /* Scrollbar styling */
+        #chat::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat:empty {
+            border: none;
+        }
+
+        #chat::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #chat::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        #chat::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        .message {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.assistant {
+    background-color: #f0f0f0;
+    text-align: left;
+}
+
+.user {
+    background-color: #d0f0c0;
+    text-align: right;
+}
+
+.loading {
+    font-style: italic;
+    color: #888;
+}
+
     </style>
 </head>
+
 <body>
     <div id="container">
-        <h1>Movie Recommendation Chat</h1>
+        <h1>🎬 Movie Recommendation Chat</h1>
         <div id="chat"></div>
         <div id="inputSection">
-            <input type="text" id="input" placeholder="Type your message here..." />
+            <input type="text" id="input" placeholder="e.g., Recommend me an action movie" />
             <button id="send">Send</button>
         </div>
     </div>
@@ -124,7 +217,7 @@
             console.log(`Sending POST request with payload:`, payload);
 
             // Append a loading message
-            appendMessage('Assistant', 'Fetching recommendations...', 'assistant loading');
+            appendMessage('Assistant', '🤔 Thinking about recommendations...', 'assistant loading');
 
             // Send POST request to backend
             fetch('http://localhost:3000/recommend', { // Ensure full URL with protocol
@@ -132,35 +225,35 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(response => response.json())
-            .then(data => {
-                // Remove the loading message
-                const loadingMessage = document.querySelector('.assistant.loading');
-                if (loadingMessage) {
-                    loadingMessage.remove();
-                }
+                .then(response => response.json())
+                .then(data => {
+                    // Remove the loading message
+                    const loadingMessage = document.querySelector('.assistant.loading');
+                    if (loadingMessage) {
+                        loadingMessage.remove();
+                    }
 
-                if (data.recommendations) {
-                    appendMessage('Assistant', data.recommendations, 'assistant');
-                } else if (data.error) {
-                    appendMessage('Assistant', `Error: ${data.error}`, 'assistant');
-                }
+                    if (data.recommendations) {
+                        appendMessage('Assistant', data.recommendations, 'assistant');
+                    } else if (data.error) {
+                        appendMessage('Assistant', `❌ Error: ${data.error}`, 'assistant');
+                    }
 
-                // Update threadId if not already set
-                if (!threadId && data.thread_id) {
-                    threadId = data.thread_id;
-                    console.log(`Conversation thread_id set to: ${threadId}`);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Remove the loading message
-                const loadingMessage = document.querySelector('.assistant.loading');
-                if (loadingMessage) {
-                    loadingMessage.remove();
-                }
-                appendMessage('Assistant', 'Sorry, an error occurred while processing your request.', 'assistant');
-            });
+                    // Update threadId if not already set
+                    if (!threadId && data.thread_id) {
+                        threadId = data.thread_id;
+                        console.log(`Conversation thread_id set to: ${threadId}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Remove the loading message
+                    const loadingMessage = document.querySelector('.assistant.loading');
+                    if (loadingMessage) {
+                        loadingMessage.remove();
+                    }
+                    appendMessage('Assistant', '❌ Sorry, an error occurred while processing your request.', 'assistant');
+                });
         });
 
         // Allow sending message with Enter key
@@ -253,6 +346,9 @@
 
             return { genre, additionalInfo };
         }
+        appendMessage('Assistant', 'Welcome! Ask me for movie recommendations by typing in the box below.', 'assistant');
+
     </script>
 </body>
+
 </html>

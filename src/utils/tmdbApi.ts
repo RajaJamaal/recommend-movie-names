@@ -74,7 +74,7 @@ export async function fetchMoviesByGenre(genre: string, filter: string = ""): Pr
                     const directors = directorResponse.data.results;
                     if (directors.length > 0) {
                         const directorId = directors[0].id;
-                        params.with_people = directorId; // Note: TMDb may not support filtering by director directly
+                        params.with_people = directorId;
                     }
                     break;
 
